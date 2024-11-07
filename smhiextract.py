@@ -13,7 +13,6 @@ def fetch_weather_data():
     # Endast de första 24 timmarna av data
     time_series_data = json_data['timeSeries'][:24]
     now = datetime.datetime.now()
-    now_24 = now + datetime.timedelta(hours=24)
     added_rows = 0
     data = []
 
@@ -46,7 +45,6 @@ def fetch_weather_data():
 df = fetch_weather_data()
 print(df.to_string(index=False))
 
-
 # Integrationstester
 class TestSMHIAPIIntegration(unittest.TestCase):
     
@@ -76,6 +74,26 @@ class TestSMHIAPIIntegration(unittest.TestCase):
                 if param['unit'] == 'Cel':
                     temperature = param['values'][0]
                     self.assertTrue(-40 <= temperature <= 50, f"Temperaturen {temperature} är utanför det förväntade intervallet.")
+
+# Enhetstester för databehandling
+class TestWeatherDataProcessing(unittest.TestCase):
+
+    def test_dataframe_structure(self):
+        df = fetch_weather_data()
+        expected_columns = ["Datum", "Timme", "Temperatur (°C)", "Regn (True/False)"]
+        self.assertListEqual(list(df.columns), expected_columns, "DataFrame-kolumner matchar inte de förväntade.")
+
+    def test_dataframe_row_count(self):
+        df = fetch_weather_data()
+        self.assertEqual(len(df), 24, "DataFrame bör innehålla exakt 24 rader.")
+
+    def test_temperature_values(self):
+        df = fetch_weather_data()
+        self.assertTrue(df["Temperatur (°C)"].between(-40, 50).all(), "Temperaturvärden ligger utanför det förväntade intervallet.")
+
+    def test_rain_column_values(self):
+        df = fetch_weather_data()
+        self.assertTrue(df["Regn (True/False)"].isin([True, False]).all(), "Kolumnen 'Regn (True/False)' bör endast innehålla boolean-värden.")
 
 # Kör testerna
 if __name__ == '__main__':
