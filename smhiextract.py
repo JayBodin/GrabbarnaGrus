@@ -45,7 +45,6 @@ def fetch_weather_data():
 df = fetch_weather_data()
 print(df.to_string(index=False))
 
-
 # Integrationstester
 class TestSMHIAPIIntegration(unittest.TestCase):
     
@@ -76,3 +75,6 @@ class TestSMHIAPIIntegration(unittest.TestCase):
                     temperature = param['values'][0]
                     self.assertTrue(-40 <= temperature <= 50, f"Temperaturen {temperature} är utanför det förväntade intervallet.")
 
+# Kör testerna
+if __name__ == '__main__':
+    unittest.main(argv=[''], verbosity=2, exit=False)
