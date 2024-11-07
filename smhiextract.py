@@ -46,9 +46,11 @@ for time_param in time_series_data:
 
     # Inkrementera timme för nästa tidsintervall
     now += datetime.timedelta(hours=1)
-
-# Skapa en DataFrame från insamlad data
+# Skapa DataFrame från insamlad data
+# Skapa DataFrame från insamlad data
 df = pd.DataFrame(data, columns=["Datum", "Timme", "Temperatur (°C)", "Regn (True/False)"])
 
-# Visa tabellen
-print(df)
+# Visa tabellen utan index
+print(df.to_string(index=False))
+
+
