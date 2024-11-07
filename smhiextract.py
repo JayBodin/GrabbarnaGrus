@@ -13,7 +13,6 @@ def fetch_weather_data():
     # Endast de första 24 timmarna av data
     time_series_data = json_data['timeSeries'][:24]
     now = datetime.datetime.now()
-    now_24 = now + datetime.timedelta(hours=24)
     added_rows = 0
     data = []
 
@@ -77,6 +76,3 @@ class TestSMHIAPIIntegration(unittest.TestCase):
                     temperature = param['values'][0]
                     self.assertTrue(-40 <= temperature <= 50, f"Temperaturen {temperature} är utanför det förväntade intervallet.")
 
-# Kör testerna
-if __name__ == '__main__':
-    unittest.main(argv=[''], verbosity=2, exit=False)
