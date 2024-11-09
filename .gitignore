@@ -1,0 +1,36 @@
+# Virtuell miljö
+venv/
+env/
+
+# Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# Flask relaterade filer
+instance/
+*.log
+*.sqlite
+*.db
+
+# Testresultat
+*.xml
+*.cover
+*.hypothesis/
+.nosetests/
+
+# IDE-filer
+.vscode/
+.idea/
+*.iml
+*.swp
+
+# Docker-relaterade filer
+Dockerfile
+docker-compose.yml
+
+# MacOS-systemfiler
+.DS_Store
+
+# Windows-systemfiler
+Thumbs.db
