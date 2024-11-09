@@ -1,5 +1,5 @@
 # Virtuell miljö
-venv/
+.venv/
 env/
 
 # Python bytecode
