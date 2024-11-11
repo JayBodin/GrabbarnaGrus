@@ -10,13 +10,12 @@ import numpy as np
 
 app = Flask(__name__)
 
-# Funktion för att hämta väderdata
 def fetch_weather_data():
     url = 'https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/18.021515/lat/59.30996/data.json'
     response = requests.get(url)
     json_data = json.loads(response.text)
 
-    time_series_data = json_data['timeSeries'][:24]  # Begränsa till de första 24 timmarna
+    time_series_data = json_data['timeSeries'][:24]
     now = datetime.datetime.now()
     data = []
 
@@ -29,11 +28,10 @@ def fetch_weather_data():
                 rain = time_data['values'][0]
 
         if temp is not None and rain is not None:
-            # Se till att rain är ett numeriskt värde (float)
             try:
                 rain = float(rain)
             except ValueError:
-                rain = 0.0  # Om rain inte går att konvertera, sätt till 0
+                rain = 0.0
 
             result = rain >= 1
             now_hour_formatted = now.strftime('%H')
@@ -54,7 +52,6 @@ def index():
 
 
 
-# Testklasserna för integration och enhetstester
 class TestSMHIAPIIntegration(unittest.TestCase):
 
     @patch('requests.get')
@@ -68,7 +65,7 @@ class TestSMHIAPIIntegration(unittest.TestCase):
             }]
         }
         mock_get.return_value.status_code = 200
-        mock_get.return_value.text = json.dumps(mock_response)  # Se till att texten är en sträng
+        mock_get.return_value.text = json.dumps(mock_response)
         weather_data = fetch_weather_data()
         self.assertIsInstance(weather_data, pd.DataFrame)
         self.assertGreater(len(weather_data), 0)
@@ -99,12 +96,12 @@ class TestSMHIAPIIntegration(unittest.TestCase):
             'timeSeries': [{
                 'parameters': [
                     {'unit': 'Cel', 'values': [15]},
-                    {'name': 'pcat', 'values': ['invalid']}  # Ogiltigt värde
+                    {'name': 'pcat', 'values': ['invalid']}
                 ]
             }]
         }
         mock_get.return_value.status_code = 200
-        mock_get.return_value.text = json.dumps(mock_response)  # Se till att texten är en sträng
+        mock_get.return_value.text = json.dumps(mock_response)
         weather_data = fetch_weather_data()
         self.assertEqual(weather_data.iloc[0]['Regn (True/False)'], False)
 
@@ -130,11 +127,10 @@ class TestWeatherDataProcessing(unittest.TestCase):
                 elif 'name' in time_data and time_data['name'] == 'pcat':
                     rain = time_data['values'][0]
             if temp is not None and rain is not None:
-                # Se till att rain är ett numeriskt värde (float)
                 try:
                     rain = float(rain)
                 except ValueError:
-                    rain = 0.0  # Om rain inte går att konvertera, sätt till 0
+                    rain = 0.0
 
                 result = rain >= 1
                 now_hour_formatted = now.strftime('%H')
@@ -153,7 +149,7 @@ class TestWeatherDataProcessing(unittest.TestCase):
         mock_json_data = {
             'timeSeries': [{
                 'parameters': [
-                    {'unit': 'Cel', 'values': [None]},  # Saknad temperatur
+                    {'unit': 'Cel', 'values': [None]},
                     {'name': 'pcat', 'values': [0.5]}
                 ]
             }]
@@ -168,11 +164,10 @@ class TestWeatherDataProcessing(unittest.TestCase):
                 elif 'name' in time_data and time_data['name'] == 'pcat':
                     rain = time_data['values'][0]
             if temp is not None and rain is not None:
-                # Se till att rain är ett numeriskt värde (float)
                 try:
                     rain = float(rain)
                 except ValueError:
-                    rain = 0.0  # Om rain inte går att konvertera, sätt till 0
+                    rain = 0.0
 
                 result = rain >= 1
                 now_hour_formatted = now.strftime('%H')
@@ -184,7 +179,6 @@ class TestWeatherDataProcessing(unittest.TestCase):
         self.assertEqual(len(df), 0)
 
 
-# Kör testerna innan Flask-start
 if __name__ == '__main__':
     result = unittest.TextTestRunner().run(unittest.defaultTestLoader.loadTestsFromModule(sys.modules[__name__]))
     if result.wasSuccessful():

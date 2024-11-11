@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - Dockerfile
+      - requirements.txt
   pull_request:
     branches:
       - main
+    paths:
+      - Dockerfile
+      - requirements.txt
   workflow_dispatch:
     inputs:
       log_errors:
@@ -36,17 +42,26 @@ jobs:
           python -m unittest discover -s tests  # Kör unittest för att hitta och köra tester i tests-mappen
         env:
           LOG_ERRORS: ${{ github.event.inputs.log_errors }}
-          
+
       - name: Upload error log if tests fail
         if: failure() && github.event.inputs.log_errors == 'true'
         run: |
           echo "Tests failed" > error.log
+          echo "Error log created at $(date)" >> error.log
         env:
           LOG_ERRORS: ${{ github.event.inputs.log_errors }}
-          
+
+      - name: Upload error log artifact
+        if: failure() && github.event.inputs.log_errors == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: error-log
+          path: error.log
+
   build:
     runs-on: ubuntu-latest
     needs: test
+    if: success()  # Only run build if tests pass
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -61,7 +76,13 @@ jobs:
           password: ${{ secrets.D_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t jacobbodin/weather_project:latest .
+        run: |
+          IMAGE_TAG="jacobbodin/weather_project:latest-${GITHUB_SHA}"
+          docker build -t $IMAGE_TAG .
+          echo "Built Docker image: $IMAGE_TAG"
 
       - name: Push Docker image
-        run: docker push jacobbodin/weather_project:latest
+        run: |
+          IMAGE_TAG="jacobbodin/weather_project:latest-${GITHUB_SHA}"
+          docker push $IMAGE_TAG
+          echo "Pushed Docker image: $IMAGE_TAG"
