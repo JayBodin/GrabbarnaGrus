@@ -23,12 +23,18 @@ jobs:
       - name: Install dependencies
         run: |
           python -m venv .venv
-          .venv/bin/python -m pip install --upgrade pip
-          .venv/bin/pip install -r requirements.txt
+          source .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Verify pytest installation
+        run: |
+          source .venv/bin/activate
+          pytest --version  # Kontrollera att pytest är installerad
 
       - name: Run tests
         run: |
-          .venv/bin/python -m pytest tests/
+          source .venv/bin/activate
+          python -m pytest tests/
         env:
           LOG_ERRORS: ${{ github.event.inputs.log_errors }}
           
@@ -38,7 +44,7 @@ jobs:
           echo "Tests failed" > error.log
         env:
           LOG_ERRORS: ${{ github.event.inputs.log_errors }}
-
+          
   build:
     runs-on: ubuntu-latest
     needs: test
