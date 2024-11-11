@@ -1,0 +1,62 @@
+name: CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      log_errors:
+        description: 'Log errors if tests fail'
+        required: true
+        default: 'false'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          source .venv/bin/activate
+          pytest tests/
+        env:
+          LOG_ERRORS: ${{ github.event.inputs.log_errors }}
+      - name: Upload error log if tests fail
+        if: failure() && github.event.inputs.log_errors == 'true'
+        run: |
+          echo "Tests failed" > error.log
+        env:
+          LOG_ERRORS: ${{ github.event.inputs.log_errors }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t your-docker-username/app-name:${{ github.sha }} .
+
+      - name: Push Docker image
+        run: docker push your-docker-username/app-name:${{ github.sha }}

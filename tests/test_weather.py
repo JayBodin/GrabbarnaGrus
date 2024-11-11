@@ -188,4 +188,4 @@ class TestWeatherDataProcessing(unittest.TestCase):
 if __name__ == '__main__':
     result = unittest.TextTestRunner().run(unittest.defaultTestLoader.loadTestsFromModule(sys.modules[__name__]))
     if result.wasSuccessful():
-        app.run(debug=True, host='0.0.0.0', port=8000)
+        print('tests successfull!')
