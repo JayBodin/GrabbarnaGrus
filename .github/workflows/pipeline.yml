@@ -1,4 +1,4 @@
-name: weather Pipeline
+name: Weather Pipeline
 
 on:
   workflow_dispatch:
@@ -29,16 +29,17 @@ jobs:
       - name: Run tests
         run: |
           source .venv/bin/activate
-          pytest tests/
+          python -m pytest tests/
         env:
           LOG_ERRORS: ${{ github.event.inputs.log_errors }}
+          
       - name: Upload error log if tests fail
         if: failure() && github.event.inputs.log_errors == 'true'
         run: |
           echo "Tests failed" > error.log
         env:
           LOG_ERRORS: ${{ github.event.inputs.log_errors }}
-
+          
   build:
     runs-on: ubuntu-latest
     needs: test
@@ -52,11 +53,11 @@ jobs:
       - name: Log in to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.D_USERNAME }}
+          password: ${{ secrets.D_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t your-docker-username/app-name:${{ github.sha }} .
+        run: docker build -t jacobbodin/weather_project:latest .
 
       - name: Push Docker image
-        run: docker push your-docker-username/app-name:${{ github.sha }}
+        run: docker push jacobbodin/weather_project:latest
