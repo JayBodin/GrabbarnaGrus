@@ -1,5 +1,5 @@
 # Välj en basimage för att köra Python
-FROM python:3.x
+FROM python:3.11
 
 # Sätt arbetskatalogen i containern
 WORKDIR /app
