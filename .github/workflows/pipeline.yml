@@ -60,4 +60,4 @@ jobs:
         run: docker build -t jacobbodin/weather_project:latest .
 
       - name: Push Docker image
-        run: docker push jacobbodin/weather_project:latest
+        run: docker push jacobbodin/weather_project:latest  .
