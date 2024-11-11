@@ -23,18 +23,18 @@ jobs:
       - name: Install dependencies
         run: |
           python -m venv .venv
-          source .venv/bin/activate
-          pip install -r requirements.txt
+          . .venv/bin/activate  # Aktivera den virtuella miljön
+          pip install -r requirements.txt  # Installera alla beroenden
 
       - name: Verify pytest installation
         run: |
-          source .venv/bin/activate
+          . .venv/bin/activate
           pytest --version  # Kontrollera att pytest är installerad
 
       - name: Run tests
         run: |
-          source .venv/bin/activate
-          python -m pytest tests/
+          . .venv/bin/activate
+          python -m pytest tests/  # Kör pytest via python -m
         env:
           LOG_ERRORS: ${{ github.event.inputs.log_errors }}
           
